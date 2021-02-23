@@ -21,9 +21,13 @@ global {
 		}
 	}
 	
+	// Add global action
 	action water_input {
+		// Foreach agent of type intersection with attribute 'source' == "Yes"
 		ask intersection where (each.source = "Yes" ) {
+			// Create new agent of type 'water' called 'water_created'
 			create water returns: water_created;
+			// Call intersection's action called 'accept_water' with arguments
 			do accept_water water_input: first(water_created);
 		}
 	}
@@ -38,6 +42,7 @@ species intersection {
 	string id_next;
 	string source;
 	intersection next_intersection;
+	// Add dynamic list of custom type
 	list<water> waters;
 		
 	aspect circle {
@@ -50,14 +55,20 @@ species intersection {
 		}
 	}
 	
+	// Add action with parameter
 	action accept_water(water water_input) {
-		waters <<water_input;
+		// Add agent 'water_input' in local list 'waters'
+		waters << water_input;
+		// Move agent 'water_input' to intersection location
 		water_input.location <- location;
 	}
 }
 
-
+// Add new specie called 'water'
 species water {
+	// Define water's aspect
+	// GTK: 'default' aspect's name will be 
+	//automatically called if nothing else is set in the display
 	aspect default{
 		draw circle(5) color: #blue;
 	}	
@@ -67,14 +78,14 @@ species water {
 experiment with_interface type: gui {
 	parameter 'GIS file of the nodes' var: intersection_file category: 'GIS';
 	parameter 'GIS file of the environment' var: env_file category: 'GIS';
+	// Define user_command calling the global action 'water_input'
 	user_command "Add water" {ask world {do water_input;}}
-
-	
 	
 	output {
 		display dynamic {
 			species intersection aspect: network;
 			species intersection aspect: circle;
+			// Display agents 'water' with default aspect
 			species water;
 		}
 	}
